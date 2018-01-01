@@ -8,81 +8,60 @@ domReady(function() {
 // p.exit(); // To detach it.
 });
 
-var sketch = new Processing.Sketch();
-sketch.attachFunction = function(processing) {
-  // Processingjs script here, and ES6 syntax is supported by built-in polyfill.
-  function rocket() {
-    this.x = 200;
-    this.y = 200;
-    this.angleDegrees = 0; // In ProcessingJs, 0 degree is oriented processing.UP.
-    this.bodyLength = 50;
-    this.bodyHeight = 60;
-    this.speed = 4;
-    this.setAngle = function(angleDegrees) {
-      this.angleDegrees = (0 + angleDegrees);
-    }
+function Rocket(imgRef) {
+  this.x = 200;
+  this.y = 200;
+  this.angleDegrees = 0; // In ProcessingJs, 0 degree is oriented processing.UP.
+  this.bodyLength = 50;
+  this.bodyHeight = 60;
+  this.speed = 4;
+  this.imgRef = imgRef;
+  this.setAngle = function(angleDegrees) {
+    this.angleDegrees = angleDegrees;
+  }
+}
+
+const drawRocket = function(processing, rocket) {
+  const radianPerDegree = (processing.PI / 180);
+  // Translate the origin of coordinate system to the current rocket.
+  processing.translate(rocket.x, rocket.y);
+  processing.rotate(rocket.angleDegrees * radianPerDegree);
+
+  const translatedAnchorX = 0;
+  const translatedAnchorY = 0;
+  processing.image(rocket.imgRef, translatedAnchorX, translatedAnchorY, rocket.bodyLength, rocket.bodyHeight);
+
+  // Reset the "accumulated rotation angle" and "accumulated translation".
+  processing.rotate(-rocket.angleDegrees * radianPerDegree);
+  processing.translate(-rocket.x, -rocket.y);
+};
+
+Window.prototype.Rocket = Rocket;
+
+function initRocketControls(processing, rocket) {
+  if (!processing.__keyPressed) return;
+  if (processing.keyCode === processing.UP) {
+    rocket.setAngle(0);
+    rocket.y = rocket.y - rocket.speed;
   }
 
-  const radianPerDegree = (processing.PI / 180);
-  const drawRocket = function(rocket) {
-    // Translate the origin of coordinate system to the current rocket.
-    processing.translate(rocket.x, rocket.y);
-    processing.rotate(rocket.angleDegrees * radianPerDegree);
+  if (processing.keyCode === processing.DOWN) {
+    rocket.setAngle(180);
+    rocket.y = rocket.y + rocket.speed;
+  }
 
-    const translatedAnchorX = 0;
-    const translatedAnchorY = 0;
-    processing.image(rocketImg, translatedAnchorX, translatedAnchorY, anchorRocket.bodyLength, anchorRocket.bodyHeight);
+  if (processing.keyCode === processing.LEFT) {
+    rocket.setAngle(270);
+    rocket.x = rocket.x - rocket.speed;
+  }
 
-    // Reset the "accumulated rotation angle" and "accumulated translation".
-    processing.rotate(-rocket.angleDegrees * radianPerDegree);
-    processing.translate(-rocket.x, -rocket.y);
-  };
+  if (processing.keyCode === processing.RIGHT) {
+    rocket.setAngle(90);
+    rocket.x = rocket.x + rocket.speed;
+  }
+}
 
+Window.prototype.initRocketControls = initRocketControls;
 
-  var anchorRocket = new rocket();
-  var singleAnimator = null;
-
-  processing.setup = function() {
-    processing.size(screen.width, screen.height);
-    rocketImg = processing.loadImage("./space/rocket.png");
-
-    processing.imageMode(processing.CENTER);
-    anchorRocket.setAngle(0);
-    
-    setInterval(function() {
-      if (!singleAnimator || !singleAnimator.hasStarted || singleAnimator.isStopped) {
-        singleAnimator = new Animator(processing, "./space/", "explosion", 15, 3, 24);
-        singleAnimator.start(anchorRocket.x, anchorRocket.y);
-      }
-    }, 3000);
-  };
-
-  processing.draw = function() {
-    processing.background(255, 255, 255);
-    drawRocket(anchorRocket);
-    if (singleAnimator) {
-      singleAnimator.display();
-    }
-    if (processing.__keyPressed) {
-      if (processing.keyCode === processing.UP) {
-        anchorRocket.setAngle(0);
-        anchorRocket.y = anchorRocket.y - anchorRocket.speed;
-      }
-
-      if (processing.keyCode === processing.DOWN) {
-        anchorRocket.setAngle(180);
-        anchorRocket.y = anchorRocket.y + anchorRocket.speed;
-      }
-
-      if (processing.keyCode === processing.LEFT) {
-        anchorRocket.setAngle(270);
-        anchorRocket.x = anchorRocket.x - anchorRocket.speed;
-      }
-
-      if (processing.keyCode === processing.RIGHT) {
-        anchorRocket.setAngle(90);
-        anchorRocket.x = anchorRocket.x + anchorRocket.speed;
-      }
-    }
-  };
-};
+var sketch = new Processing.Sketch();
+Window.prototype.sketch = sketch;

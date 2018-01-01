@@ -1,7 +1,11 @@
-function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps) {
+function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps, offsetInOrientation) {
   this.fps = fps;
   if (undefined === this.fps || null === this.fps) {
     this.fps = 24;
+  }
+  this.offsetInOrientation = offsetInOrientation;
+  if (undefined === this.offsetInOrientation || null === this.offsetInOrientation) {
+    this.offsetInOrientation = 0;
   }
   this.frame = 0;
   this.imageCount = count;
@@ -11,6 +15,10 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
   this.startedTs = null;
   this.cx = null;
   this.cy = null;
+  this.orientationDegrees = null;
+
+  this.scheduledRepeatedly = false;
+  this.maxDurationMillis = null;
 
   for (let i = 0; i < this.imageCount; i++) {
     // Use nf() to number format 'i' into four digits
@@ -18,27 +26,58 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
     this.images.push(processing.loadImage(filename));
   }
 
-  this.start = function(cx, cy) {
+  this.start = function(cx, cy, orientationDegrees, scheduledRepeatedly, maxDurationMillis) {
     const ins = this;
     const startedTs = Date.now();
     ins.startedTs = startedTs;
     ins.hasStarted = true;
-    if (undefined !== cx && null !== cx && undefined !== cy && null !== cy) {
+    if (undefined !== cx && null !== cx && undefined !== cy && null !== cy && "number" == typeof cx && "number" == typeof cy) {
       this.cx = cx;
       this.cy = cy;
     }
+
+    if (undefined !== orientationDegrees && null !== orientationDegrees && "number" == typeof orientationDegrees) {
+      this.orientationDegrees = orientationDegrees;
+    }
+    
+    if (true == scheduledRepeatedly) {
+      this.scheduledRepeatedly = true;
+    }
+    
+    if (undefined !== maxDurationMillis && null !== maxDurationMillis && "number" == typeof maxDurationMillis) {
+      this.maxDurationMillis = maxDurationMillis;
+    }
     const millisPerFrame = parseInt(1000 / fps);
     const itv = setInterval(function() {
+      if (ins.isStopped) {
+        clearInterval(itv);
+      }
       const elapsedMs = (Date.now() - startedTs);
       ins.frame = parseInt(elapsedMs / millisPerFrame);
       if (ins.frame >= ins.imageCount) {
-        ins.isStopped = true;
-        clearInterval(itv);
+        if (true != ins.scheduledRepeatedly) {
+          ins.isStopped = true;
+          clearInterval(itv);
+        } else {
+          ins.frame = (ins.frame % ins.fps);
+        }
       }
     }, millisPerFrame);
+
+    if (null !== ins.maxDurationMillis) {
+      const timeout = setTimeout(function() {
+        ins.isStopped = true; 
+        clearTimeout(timeout); 
+      }, ins.maxDurationMillis);
+    }
   };
 
-  this.display = function(cx, cy) {
+  this.stop = function() {
+    ins.isStopped = true;
+    ins.frame = 0;
+  }
+
+  this.display = function(cx, cy, orientationDegrees) {
     const ins = this;
     if (ins.isStopped) {
       return;
@@ -56,10 +95,18 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
     if (undefined === cy || null === cy) {
       cy = this.cy;
     }
+    if (undefined === orientationDegrees || null === orientationDegrees) {
+      orientationDegrees = this.orientationDegrees;
+    }
+
+    var radianPerDegree = (processing.PI / 180);
+    var radians = (orientationDegrees * radianPerDegree);
     // W.r.t. current origin.
     processing.imageMode(processing.CENTER);
     processing.translate(cx, cy);
-    processing.image(ins.images[ins.frame], 0, 0);
+    processing.rotate(radians);
+    processing.image(ins.images[ins.frame], 0, this.offsetInOrientation);
+    processing.rotate(-radians);
     processing.translate(-cx, -cy);
   };
 
