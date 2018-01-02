@@ -22,13 +22,13 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
 
   for (let i = 0; i < this.imageCount; i++) {
     // Use nf() to number format 'i' into four digits
-    const filename = dirWithSlash + imageNamePrefix + processing.nf(i, ndigits) + ".gif";
+    var filename = dirWithSlash + imageNamePrefix + processing.nf(i, ndigits) + ".gif";
     this.images.push(processing.loadImage(filename));
   }
 
   this.start = function(cx, cy, orientationDegrees, scheduledRepeatedly, maxDurationMillis) {
-    const ins = this;
-    const startedTs = Date.now();
+    var ins = this;
+    var startedTs = Date.now();
     ins.startedTs = startedTs;
     ins.hasStarted = true;
     if (undefined !== cx && null !== cx && undefined !== cy && null !== cy && "number" == typeof cx && "number" == typeof cy) {
@@ -47,12 +47,12 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
     if (undefined !== maxDurationMillis && null !== maxDurationMillis && "number" == typeof maxDurationMillis) {
       this.maxDurationMillis = maxDurationMillis;
     }
-    const millisPerFrame = parseInt(1000 / fps);
-    const itv = setInterval(function() {
+    var millisPerFrame = parseInt(1000 / fps);
+    var itv = setInterval(function() {
       if (ins.isStopped) {
         clearInterval(itv);
       }
-      const elapsedMs = (Date.now() - startedTs);
+      var elapsedMs = (Date.now() - startedTs);
       ins.frame = parseInt(elapsedMs / millisPerFrame);
       if (ins.frame >= ins.imageCount) {
         if (true != ins.scheduledRepeatedly) {
@@ -65,7 +65,7 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
     }, millisPerFrame);
 
     if (null !== ins.maxDurationMillis) {
-      const timeout = setTimeout(function() {
+      var timeout = setTimeout(function() {
         ins.isStopped = true; 
         clearTimeout(timeout); 
       }, ins.maxDurationMillis);
@@ -73,13 +73,13 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
   };
 
   this.stop = function() {
-    const ins = this;
+    var ins = this;
     ins.isStopped = true;
     ins.frame = 0;
   }
 
   this.display = function(cx, cy, orientationDegrees) {
-    const ins = this;
+    var ins = this;
     if (ins.isStopped) {
       return;
     }
