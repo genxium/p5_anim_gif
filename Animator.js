@@ -73,6 +73,7 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
   };
 
   this.stop = function() {
+    const ins = this;
     ins.isStopped = true;
     ins.frame = 0;
   }
