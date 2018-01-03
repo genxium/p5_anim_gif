@@ -30,6 +30,7 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
     var ins = this;
     var startedTs = Date.now();
     ins.startedTs = startedTs;
+    ins.isStopped = false;
     ins.hasStarted = true;
     if (undefined !== cx && null !== cx && undefined !== cy && null !== cy && "number" == typeof cx && "number" == typeof cy) {
       this.cx = cx;
