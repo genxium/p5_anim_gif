@@ -21,14 +21,14 @@ function Rocket(imgRef) {
   }
 }
 
-const drawRocket = function(processing, rocket) {
-  const radianPerDegree = (processing.PI / 180);
+var drawRocket = function(processing, rocket) {
+  var radianPerDegree = (processing.PI / 180);
   // Translate the origin of coordinate system to the current rocket.
   processing.translate(rocket.x, rocket.y);
   processing.rotate(rocket.angleDegrees * radianPerDegree);
 
-  const translatedAnchorX = 0;
-  const translatedAnchorY = 0;
+  var translatedAnchorX = 0;
+  var translatedAnchorY = 0;
   processing.image(rocket.imgRef, translatedAnchorX, translatedAnchorY, rocket.bodyLength, rocket.bodyHeight);
 
   // Reset the "accumulated rotation angle" and "accumulated translation".

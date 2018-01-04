@@ -20,7 +20,7 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
   this.scheduledRepeatedly = false;
   this.maxDurationMillis = null;
 
-  for (let i = 0; i < this.imageCount; i++) {
+  for (var i = 0; i < this.imageCount; i++) {
     // Use nf() to number format 'i' into four digits
     var filename = dirWithSlash + imageNamePrefix + processing.nf(i, ndigits) + ".gif";
     this.images.push(processing.loadImage(filename));
