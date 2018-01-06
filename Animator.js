@@ -1,4 +1,4 @@
-function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps, offsetInOrientation) {
+function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps, offsetInOrientation, width, height) {
   this.fps = fps;
   if (undefined === this.fps || null === this.fps) {
     this.fps = 24;
@@ -7,6 +7,14 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
   if (undefined === this.offsetInOrientation || null === this.offsetInOrientation) {
     this.offsetInOrientation = 0;
   }
+
+  this.width = null;
+  this.height = null;
+  if (undefined !== width && null !== width && undefined !== height && null !== height) {
+    this.width = width;
+    this.height = height;
+  }
+
   this.frame = 0;
   this.imageCount = count;
   this.images = [];
@@ -107,7 +115,11 @@ function Animator(processing, dirWithSlash, imageNamePrefix, count, ndigits, fps
     processing.imageMode(processing.CENTER);
     processing.translate(cx, cy);
     processing.rotate(radians);
-    processing.image(ins.images[ins.frame], 0, this.offsetInOrientation);
+    if (undefined !== this.width && null !== this.width && undefined !== this.height && null !== this.height) {
+      processing.image(ins.images[ins.frame], 0, this.offsetInOrientation, this.width, this.height);
+    } else {
+      processing.image(ins.images[ins.frame], 0, this.offsetInOrientation);
+    }
     processing.rotate(-radians);
     processing.translate(-cx, -cy);
   };

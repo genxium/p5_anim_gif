@@ -3,12 +3,15 @@ function AnimatorManager(processing, dirWithSlash) {
   this.processing = processing;
   this.dirWithSlash = dirWithSlash;
 
-  this.lazyStart = function(key, imageNamePrefix, count, ndigits, fps, offsetInOrientation, cx, cy, orientationDegrees, scheduledRepeatedly, maxDurationMillis) {
+  this.lazyStart = function(key, imageNamePrefix, count, ndigits, fps, offsetInOrientation, width, height, cx, cy, orientationDegrees, scheduledRepeatedly, maxDurationMillis, excludeStopped) {
     var singleAnimator = this.cache[key];
     if (!singleAnimator) {
-      singleAnimator = new Animator(this.processing, this.dirWithSlash, imageNamePrefix, count, ndigits, fps);
+      singleAnimator = new Animator(this.processing, this.dirWithSlash, imageNamePrefix, count, ndigits, fps, offsetInOrientation, width, height);
       this.cache[key] = singleAnimator;
     } 
+    if (singleAnimator.isStopped && true == excludeStopped) {
+      return;
+    }
     if (!singleAnimator.hasStarted || singleAnimator.isStopped) {
       singleAnimator.start(cx, cy, orientationDegrees, scheduledRepeatedly, maxDurationMillis);
     }

@@ -12,7 +12,9 @@ sketch.attachFunction = function(processing) {
     processing.imageMode(processing.CENTER);
     
     if (!singleAnimator || !singleAnimator.hasStarted || singleAnimator.isStopped) {
-      singleAnimator = new Animator(processing, "./space/", "explosion", 15, 3, 24, -150);
+      var animW = 64;
+      var animH = 128;
+      singleAnimator = new Animator(processing, "./space/", "explosion", 15, 3, 24, -90, animW, animH);
       singleAnimator.start(anchorRocket.x, anchorRocket.y, anchorRocket.angleDegrees + 180, true, 5000 /* 5 seconds */);
     }
   };
